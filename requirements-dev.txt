@@ -1,0 +1,10 @@
+# Development / test dependencies — NOT needed to run the app.
+#   pip install -r requirements-dev.txt
+#
+# The runtime deps in requirements.txt are still required; install both to
+# run the full suite. hypothesis is optional — the property-based tests skip
+# cleanly without it — but it's what the maintainer runs, so the advertised
+# test count matches only when it's installed.
+
+pytest>=7.0
+hypothesis>=6.0

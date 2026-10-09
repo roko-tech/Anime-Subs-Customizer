@@ -1,0 +1,15 @@
+name: Feature request · اقتراح ميزة
+description: An idea to make the app better. · فكرة لتحسين التطبيق.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do? · ماذا تريد أن تفعل؟
+      description: Describe the problem or situation, not only the solution. · صف المشكلة أو الموقف، وليس الحل فقط.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could the app help? · كيف يمكن أن يساعد التطبيق؟

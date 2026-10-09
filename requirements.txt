@@ -1,0 +1,42 @@
+# Core GUI + imaging
+Pillow>=9.0
+# 5.2.2+: earlier releases import distutils (gone in Python 3.12) or an
+# undeclared 'packaging'. <6: the GUI hasn't been verified on customtkinter 6.
+customtkinter>=5.2.2,<6
+pystray>=0.19.0
+
+# Complex-script shaping for the PIL-rendered preview (well + font-picker
+# specimen). Pillow only shapes RTL itself when built with libraqm (stock
+# Windows wheels aren't), so we shape with HarfBuzz and rasterize with FreeType
+# — the same pipeline the real subtitle renderer (libass) uses — which draws
+# every Arabic font correctly, including the ~45% that ship no legacy
+# presentation forms. Optional: if missing, the preview falls back to
+# arabic-reshaper (below), which only reaches fonts that DO have those forms.
+uharfbuzz>=0.30
+freetype-py>=2.3
+
+# Fallback Arabic shaping (presentation forms) + bidi, used when uharfbuzz/
+# freetype-py are unavailable. Optional: if these are missing too AND raqm is
+# absent, RTL preview text renders unshaped.
+arabic-reshaper>=3.0
+python-bidi>=0.4
+
+# Encoding detection for subtitles without a BOM (FileProcessor._legacy_candidates).
+# Pinned to the 5.x line (LGPL-2.1+): 7.x is a relicensed rewrite with different
+# confidence behaviour; tests/test_legacy_encodings.py pins the decoding results.
+chardet>=5.2,<6
+
+# Filesystem-change events for the folder monitor. Optional: if it's missing (or
+# the observer can't start, e.g. on a network share) the monitor falls back to
+# periodic polling, so monitoring still works — watchdog just makes it react in
+# ~1s instead of on the poll interval, and keeps idle CPU near zero.
+watchdog>=3.0
+
+# Windows-only integration: tray autostart shortcut, single-instance guard,
+# and the RTL preview hack. Skipped automatically on other platforms.
+pywin32>=305; sys_platform == "win32"
+winshell>=0.6; sys_platform == "win32"
+
+# Note: tkinter is also required but is NOT pip-installable — it ships with
+# the official Python installer on Windows/macOS, or via the OS
+# 'python3-tk' package on Linux.

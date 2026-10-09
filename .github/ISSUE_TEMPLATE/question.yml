@@ -1,0 +1,15 @@
+name: Question · سؤال
+description: Ask how something works. · اسأل عن طريقة عمل شيء ما.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the [user guide](https://github.com/roko-tech/Anime-Subs-Customizer/blob/master/docs/guide.md) first.
+        يُرجى مراجعة [دليل الاستخدام](https://github.com/roko-tech/Anime-Subs-Customizer/blob/master/docs/guide.ar.md) أولًا.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question · سؤالك
+    validations:
+      required: true

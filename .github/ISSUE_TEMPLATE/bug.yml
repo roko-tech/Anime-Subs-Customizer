@@ -1,0 +1,57 @@
+name: Bug report · بلاغ عن مشكلة
+description: Something doesn't work as expected. · شيء لا يعمل كما ينبغي.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please write in English or Arabic.
+        شكرًا على البلاغ! اكتب بالعربية أو الإنجليزية.
+
+        **Privacy:** logs and crash reports contain your folder and file names. Remove anything private before you paste or attach them.
+        **الخصوصية:** تحتوي السجلات وتقارير الأعطال على أسماء مجلداتك وملفاتك. احذف أي شيء خاص قبل لصقها أو إرفاقها.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? · ماذا حدث؟
+      description: What did you do, what did you expect, and what happened instead? · ماذا فعلت، وماذا توقعت، وماذا حدث بدلًا من ذلك؟
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce · خطوات إعادة المشكلة
+      placeholder: |
+        1.
+        2.
+        3.
+  - type: input
+    id: version
+    attributes:
+      label: App version · إصدار التطبيق
+      description: ⋯ → About. Filled in for you when you use "Report a problem…" in the app. · من ⋯ ← حول التطبيق، ويُملأ تلقائيًا عند استخدام «الإبلاغ عن مشكلة…».
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version · إصدار ويندوز
+      placeholder: Windows 11 24H2
+  - type: dropdown
+    id: language
+    attributes:
+      label: App language · لغة التطبيق
+      options:
+        - English
+        - العربية
+  - type: textarea
+    id: subtitle
+    attributes:
+      label: A sample subtitle (optional) · ملف ترجمة كمثال (اختياري)
+      description: If one file is styled wrongly, attach it (rename it to .txt) and its copy from "Original Subs". Only share files you're allowed to share. · إذا نُسّق ملف بشكل خاطئ فأرفقه (غيّر امتداده إلى ‎.txt‎) مع نسخته من «Original Subs». شارك فقط ما يحق لك مشاركته.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log or crash details (optional) · السجل أو تفاصيل العطل (اختياري)
+      description: ⋯ → Open log, or "Copy details" in the error window. Remove private names first. · من ⋯ ← فتح السجل، أو «نسخ التفاصيل» في نافذة الخطأ. احذف الأسماء الخاصة أولًا.
+      render: text

@@ -1,0 +1,10 @@
+# Build/release environment for the Windows app (see docs/adr/ADR-001-packaging.md).
+# Locked with hashes into requirements-lock.txt:
+#   uv pip compile requirements-build.in --generate-hashes --python-version 3.13 --python-platform x86_64-pc-windows-msvc -o requirements-lock.txt
+-r requirements.txt
+pyinstaller==6.22.3
+pyinstaller-hooks-contrib==2026.8
+pip-licenses==5.5.5
+cyclonedx-bom==7.5.0
+pytest==9.1.1
+hypothesis==6.168.5

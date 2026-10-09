@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+
+# FFmpeg binaries for a source run (the installer bundles its own)
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+bin/
+
+# SQLite runtime files
+*.db
+*.db-wal
+*.db-shm
+
+# Runtime/cache files
+*.log
+*.log.*
+*.tmp
+ffmpeg_cache.json
+font_path_cache.json
+font_support_cache.json
+config.json
+preview_frame*.jpg
+preview_frame*.txt
+
+# Test artifacts
+.hypothesis/
+.pytest_cache/
+
+# Backup files
+*.backup
+
+# Local scratch files (not part of the repository)
+probe.py
+
+# Local working folders (not part of the repository)
+docs/design-handoff/
+design_handoff_studio_redesign/
+
+# Claude Code
+.claude/
+
+# Build output (scripts/build.ps1, PyInstaller, Inno Setup)
+build/
+dist/
+.venv-build/
+.venv/

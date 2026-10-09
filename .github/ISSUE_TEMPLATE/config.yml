@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security problem · مشكلة أمنية
+    url: https://github.com/roko-tech/Anime-Subs-Customizer/security/advisories/new
+    about: Report it privately, not in a public issue. · أبلغ عنها بشكل خاص، لا في بلاغ عام.
+  - name: Windows says it "protected your PC" · يقول ويندوز إنه «حمى جهازك»
+    url: https://github.com/roko-tech/Anime-Subs-Customizer/blob/master/docs/install-help.md
+    about: What the installation warnings mean and what to click. · ما معنى تحذيرات التثبيت وماذا تضغط.
