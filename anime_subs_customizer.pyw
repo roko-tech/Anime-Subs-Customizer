@@ -2440,8 +2440,10 @@ class GUI:
                     suffix = f" · {rel}"
                 # Each piece is its own label, so each gets its own RTL base:
                 # without it the " · " before the time hung at the far end.
+                # The file name reads like Explorer instead (a batch count is
+                # RTL-embedded where it was noted and kept as it is).
                 GUI._footer_prefix.configure(text=rtl_base(prefix))
-                GUI._footer_name.configure(text=rtl_base(_ellipsize(name, 48)))
+                GUI._footer_name.configure(text=ltr_name(_ellipsize(name, 48)))
                 GUI._footer_suffix.configure(text=rtl_base(suffix))
             else:
                 GUI._footer_prefix.configure(
@@ -2961,7 +2963,9 @@ class GUI:
                 return
             GUI.toggle_monitoring()
 
-        folder = filedialog.askdirectory()
+        folder = filedialog.askdirectory(
+            initialdir=app_state.monitored_folder or None,
+            title=t_raw("pick_folder_title"))
         if not folder:
             return
 
@@ -3590,7 +3594,7 @@ class GUI:
 
             if count:
                 event_key = "event_files_one" if count == 1 else "event_files_many"
-                app_state.note_event("Styled", t_logical(event_key, n=count))
+                app_state.note_event("Styled", rtl_base(t_logical(event_key, n=count)))
 
             problems = sum(1 for i in IssueTracker.get_issues() if i.timestamp >= started)
             left = max(0, total - count - current)
@@ -3700,7 +3704,7 @@ class GUI:
 
             if count:
                 event_key = "event_videos_one" if count == 1 else "event_videos_many"
-                app_state.note_event("Extracted", t_logical(event_key, n=count))
+                app_state.note_event("Extracted", rtl_base(t_logical(event_key, n=count)))
 
             if app_state.root:
                 app_state.root.after(
@@ -3734,7 +3738,7 @@ class GUI:
             # its own line as a left-to-right value (str(e) repeats it escaped).
             detail = friendly_reason(str(e)) or getattr(e, "strerror", None) or str(e)
             GUI.show_error(t_raw("error_title"), t_raw(
-                "cant_open_log", err=detail, path=str(LOG_PATH)))
+                "cant_open_log", err=detail, path=ltr_name(LOG_PATH)))
 
     @staticmethod
     def _refresh_issues_label() -> None:
@@ -3812,7 +3816,7 @@ class GUI:
                        if issue.operation in OP_PILL else "op_")
                 header = [
                     (f" {operation_label(issue.operation)} ", tag),
-                    ("  " + rtl_base(_ellipsize(issue.filename, 64)) + "  ", "name"),
+                    ("  " + ltr_name(_ellipsize(issue.filename, 64)) + "  ", "name"),
                     (" " + _issue_timestamp(issue.timestamp), "meta"),
                 ]
                 for text, run_tag in (reversed(header) if is_rtl() else header):
@@ -3942,10 +3946,10 @@ class GUI:
             )
             box.pack(side=SIDE_START(), padx=CHECK_PAD(10), pady=9)
 
-            # An Arabic series name needs an RTL base, or "(2030)" in
-            # "حديقة السماء (2030)" lands next to the checkbox.
+            # Folder names read the way File Explorer shows them, even in
+            # Arabic (the Arabic review's choice for every file/folder name).
             name_lbl = ctk.CTkLabel(
-                row, text=rtl_base(parent.name), font=f_row, text_color=C_TEXT_2,
+                row, text=ltr_name(parent.name), font=f_row, text_color=C_TEXT_2,
                 anchor=ANCHOR_START(),
             )
             name_lbl.pack(side=SIDE_START(), fill="x", expand=True,
@@ -4042,7 +4046,7 @@ class GUI:
             if not groups:
                 GUI.show_info(
                     t_raw("no_backups_title"),
-                    t_raw("no_backups_body", path=base)
+                    t_raw("no_backups_body", path=ltr_name(base))
                 )
                 GUI._clear_operation_flag()
                 return
@@ -4051,7 +4055,8 @@ class GUI:
                 parent, backups = groups[0]
                 if not GUI.ask_yes_no(
                     t_raw("confirm_restore_title"),
-                    t_raw("overwrite_styled_q", n=len(backups), name=parent.name),
+                    t_raw("overwrite_styled_q", n=len(backups),
+                          name=ltr_name(parent.name)),
                     danger=True,
                 ):
                     GUI._clear_operation_flag()
@@ -4120,7 +4125,7 @@ class GUI:
                 if restored:
                     event_key = ("event_files_one" if restored == 1
                                  else "event_files_many")
-                    app_state.note_event("Restored", t_logical(event_key, n=restored))
+                    app_state.note_event("Restored", rtl_base(t_logical(event_key, n=restored)))
 
                 if app_state.root:
                     msg = t_raw("restored_n", n=restored)

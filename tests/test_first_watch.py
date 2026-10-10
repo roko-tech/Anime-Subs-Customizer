@@ -90,5 +90,28 @@ class RiskyFolderTests(unittest.TestCase):
                 self.assertFalse(gui.GUI._risky_folder(str(lib)))
 
 
+class FolderPickerTests(unittest.TestCase):
+    """Change… and the welcome button used an untitled picker, so the Arabic
+    UI showed Windows' own English caption (flagged in the Arabic review)."""
+
+    def _pick(self, current):
+        st = gui.app_state
+        saved = (st.operation_in_progress, st.monitoring_flag, st.monitored_folder)
+        st.operation_in_progress, st.monitoring_flag, st.monitored_folder = False, False, current
+        try:
+            with patch.object(gui.filedialog, "askdirectory", return_value="") as ask:
+                gui.GUI.select_folder()
+        finally:
+            st.operation_in_progress, st.monitoring_flag, st.monitored_folder = saved
+        return ask.call_args.kwargs
+
+    def test_the_picker_has_the_apps_own_title(self):
+        self.assertEqual(self._pick(None)["title"], gui.t_raw("pick_folder_title"))
+
+    def test_it_opens_at_the_current_folder(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(self._pick(d)["initialdir"], d)
+
+
 if __name__ == "__main__":
     unittest.main()

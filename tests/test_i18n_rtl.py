@@ -50,6 +50,41 @@ class RtlParagraphTests(unittest.TestCase):
         i18n.set_language("en")
         self.assertEqual(i18n._rtl_base("Line one\nLine two"), "Line one\nLine two")
         self.assertEqual(i18n.t_raw("busy_title"), i18n._STRINGS["en"]["busy_title"])
+        self.assertEqual(i18n.ltr_name("حديقة السماء.ass"), "حديقة السماء.ass")
+
+    def test_file_names_read_left_to_right_like_explorer(self):
+        # Chosen in the Arabic review: a name keeps Explorer's order even
+        # when it is Arabic ("حديقة السماء - الحلقة 01.en.ass").
+        name = "حديقة السماء - الحلقة 01.en.ass"
+        self.assertEqual(i18n.ltr_name(name), LRE + name + PDF)
+        self.assertEqual(i18n.ltr_name("Show - 01.ass"), LRE + "Show - 01.ass" + PDF)
+
+    def test_brackets_in_a_name_stay_paired(self):
+        # Windows' text engine (used by Tk) lacks the bracket-pair rule, so in
+        # an LTR run "حديقة السماء (2030)" drew as "2030) حديقة السماء)".
+        # A mark on each bracket gives what Explorer and browsers show.
+        LRM, RLM = "‎", "‏"
+        self.assertEqual(i18n.ltr_name("حديقة السماء (2030)"),
+                         LRE + "حديقة السماء " + RLM + "(2030)" + RLM + PDF)
+        self.assertEqual(i18n.ltr_name("حديقة السماء - 01 (1080p).ar.ass"),
+                         LRE + "حديقة السماء - 01 " + LRM + "(1080p)" + LRM + ".ar.ass" + PDF)
+        # Latin brackets resolve on their own: no marks.
+        self.assertEqual(i18n.ltr_name("Sky Garden (2031)"), LRE + "Sky Garden (2031)" + PDF)
+
+    def test_a_count_in_the_footer_keeps_its_arabic_base(self):
+        # The footer shows "3 من الملفات" after a batch, not a file name.
+        count = i18n.rtl_base("3 من الملفات")
+        self.assertEqual(i18n.ltr_name(count), count)
+
+    def test_a_name_embedded_by_the_caller_is_not_embedded_twice(self):
+        i18n._STRINGS["ar"]["__probe__"] = "لا توجد نسخ في {path}."
+        try:
+            arabic = i18n.t_raw("__probe__", path=i18n.ltr_name("D:\\فيديو"))
+            latin = i18n.t_raw("__probe__", path=i18n.ltr_name("D:\\Videos"))
+        finally:
+            del i18n._STRINGS["ar"]["__probe__"]
+        self.assertIn(LRE + "D:\\فيديو" + PDF, arabic)
+        self.assertIn(" " + LRE + "D:\\Videos" + PDF + ".", latin)
 
     def test_no_isolate_marks_in_any_string(self):
         for lang, table in i18n._STRINGS.items():

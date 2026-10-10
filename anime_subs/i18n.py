@@ -17,7 +17,7 @@ except ImportError:  # pragma: no cover - python-bidi is a listed dependency
 __all__ = ["t", "t_raw", "t_logical", "set_language", "get_language",
            "is_rtl", "LANGUAGES", "visual_rtl", "resolve_ui_language",
            "windows_ui_language_id", "installer_language", "friendly_reason",
-           "operation_label", "rtl_base", "wrap_rtl"]
+           "operation_label", "rtl_base", "wrap_rtl", "ltr_name"]
 
 
 def _is_rtl_char(ch: str) -> bool:
@@ -192,9 +192,72 @@ def _ltr_value(value: Any) -> Any:
     inside an Arabic sentence. Uses LRE…PDF, not the newer isolate marks, which
     GDI on Windows 10 draws as visible boxes."""
     if (is_rtl() and isinstance(value, str) and value
+            and not value.startswith(_LRE)  # already embedded by ltr_name
             and not any(_is_rtl_char(c) for c in value)):
         return _LRE + value + _PDF
     return value
+
+
+def ltr_name(name: Any) -> str:
+    """In the Arabic UI, embed a file or folder name (or a path) as an LTR run
+    even when it is Arabic, so it reads the way File Explorer shows it
+    ("حديقة السماء - الحلقة 01.en.ass" keeps its order); chosen in the Arabic
+    review. Text that already carries an embedding (a count phrase such as
+    "3 من الملفات" passed through rtl_base) is left as it is. A no-op in
+    English."""
+    name = str(name)
+    if is_rtl() and name and not name.startswith(_EMBED_OPENERS):
+        return _LRE + _pair_brackets(name) + _PDF
+    return name
+
+
+_OPENERS, _CLOSERS = "([{", ")]}"
+
+
+def _pair_brackets(s: str) -> str:
+    """Mark each bracket pair with the direction the Unicode bracket-pair rule
+    (UBA N0) gives it in an LTR run. Windows' text engine, which Tk uses,
+    lacks that rule, so in "حديقة السماء (2030)" the ")" took the run's LTR
+    direction while "(" went RTL and the pair came apart. An LRM/RLM beside
+    each bracket makes Tk draw what Explorer and browsers do."""
+    dirs: List[Optional[str]] = []  # per character: "L", "R" or None
+    last = "L"
+    for c in s:
+        b = unicodedata.bidirectional(c)
+        if b in ("L", "R", "AL"):
+            last = "L" if b == "L" else "R"
+            dirs.append(last)
+        elif b in ("EN", "AN"):  # a number counts with the text before it
+            dirs.append("R" if b == "AN" else last)
+        else:
+            dirs.append(None)
+    if "R" not in dirs:  # an all-LTR name already draws right
+        return s
+    marks: Dict[int, str] = {}
+    stack: List[int] = []
+    for i, c in enumerate(s):
+        if c in _OPENERS:
+            stack.append(i)
+        elif c in _CLOSERS:
+            want = _OPENERS[_CLOSERS.index(c)]
+            for k in range(len(stack) - 1, -1, -1):
+                if s[stack[k]] == want:
+                    o = stack[k]
+                    del stack[k:]
+                    inside = dirs[o + 1:i]
+                    if "L" in inside:
+                        d = "L"
+                    elif "R" in inside:  # RTL only after RTL context
+                        d = next((x for x in reversed(dirs[:o]) if x), "L")
+                    else:
+                        break
+                    marks[o] = marks[i] = "‎" if d == "L" else "‏"
+                    break
+    if not marks:
+        return s
+    return "".join(marks[i] + c if i in marks and c in _OPENERS
+                   else c + marks[i] if i in marks else c
+                   for i, c in enumerate(s))
 
 
 def rtl_base(s: str) -> str:
@@ -320,6 +383,7 @@ _STRINGS: Dict[str, Dict[str, str]] = {
         "apply_subfolder": "A specific series…",
         "apply_subfolder_hint": "Pick one anime's folder to restyle only its subtitles.",
         "apply_pick_title": "Choose a series folder",
+        "pick_folder_title": "Choose your anime folder",
         "extract_subs": "Extract subs",
         "restore_originals": "Restore originals…",
         # Footer
@@ -580,6 +644,7 @@ _STRINGS: Dict[str, Dict[str, str]] = {
         "apply_subfolder": "مسلسل محدّد…",
         "apply_subfolder_hint": "اختر مجلد أنمي واحد لإعادة تنسيق ترجماته فقط.",
         "apply_pick_title": "اختر مجلد المسلسل",
+        "pick_folder_title": "اختر مجلد الأنمي",
         "extract_subs": "استخراج الترجمات",
         "restore_originals": "استعادة النسخ الأصلية…",
         # Footer

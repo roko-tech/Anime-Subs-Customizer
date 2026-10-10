@@ -241,8 +241,8 @@ UNCAPTURED: List[Tuple[str, str, List[str], str]] = [
     ("tray_balloons", "Notification-area balloons (first minimise to tray; update found while in the tray)", [
         "tray_hint", "update_available_tray"],
      "Windows shell notifications, drawn by Explorer outside the app's windows."),
-    ("folder_picker", "Windows folder picker (Change... / A specific series... / welcome)", [
-        "apply_pick_title"],
+    ("folder_picker", "Windows folder picker (Change... / welcome; A specific series...)", [
+        "pick_folder_title", "apply_pick_title"],
      "Native Explorer dialog: it lists this machine's real drives and folders, "
      "so it is not captured. Only its title comes from the app."),
     ("preview_font_no_latin", "Preview-well note for an Arabic-only font", ["font_no_latin"],
@@ -769,7 +769,7 @@ class Shooter:
             count = re.search(r"\d+", name)
             for noun in ("event_files_one", "event_files_many",
                          "event_videos_one", "event_videos_many"):
-                if count and self.i18n.t_logical(noun, n=int(count.group())) == name:
+                if count and self.i18n.t_logical(noun, n=int(count.group())) == plain(name):
                     keys.append(noun)
             if not st.monitoring_flag:
                 keys.append("ev_idle_last")
@@ -945,15 +945,22 @@ class Shooter:
         fav.invoke()
         yield 600
 
+        # Tk drops a generated <KeyRelease> unless the app holds keyboard
+        # focus (the v2 gallery showed the full list under "zzqx"). The entry's
+        # <<Cut>> binding runs the same search sync, and with nothing selected
+        # the Entry class binding cuts nothing.
         search = self.find(dlg, ctk.CTkEntry)
+        fonts = self.find(dlg, self.tk.Text)
         search.insert(0, "zzqx")
-        search._entry.event_generate("<KeyRelease>")  # as typing would
-        yield 900  # 150 ms search debounce + specimen render
-        self.find(dlg, self.tk.Text).focus_set()
+        search._entry.event_generate("<<Cut>>")
+        yield from until(lambda: not fonts.get("1.0", "end").strip(), 10,
+                         "the empty font list")
+        yield 900  # specimen render
+        fonts.focus_set()
         yield 300
         yield from self.shoot("font_picker_no_match", dlg)
         search.delete(0, "end")
-        search._entry.event_generate("<KeyRelease>")
+        search._entry.event_generate("<<Cut>>")
         yield 400
         yield from self.close_window(dlg)
 
