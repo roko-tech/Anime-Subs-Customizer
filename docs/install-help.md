@@ -28,6 +28,8 @@ When you open the installer, Microsoft Defender SmartScreen may show a blue wind
 
 <img src="screenshots/install/smartscreen-1.png" alt="Windows protected your PC, with the More info link" width="420"> <img src="screenshots/install/smartscreen-2.png" alt="The same window after More info, with the Run anyway button" width="420">
 
+On some PCs Windows shows an older box instead: *"Open File - Security Warning: The publisher could not be verified."* Check that the name ends in **AnimeSubsCustomizer-Setup.exe** and click **Run**.
+
 The installer doesn't ask for administrator rights: it installs only for you, in `%LOCALAPPDATA%\Programs\Anime Subs Customizer`.
 
 ## 3. Smart App Control (Windows 11)
@@ -43,7 +45,7 @@ You have two options:
 
 The app is built with PyInstaller, a common tool for packaging Python apps. Some antivirus programs flag apps built this way even when they're harmless. The app also rewrites many subtitle files, which behaviour-based protections watch closely.
 
-- Every release is scanned on VirusTotal before it's published, and the results are linked from the release page.
+- Every release is scanned on VirusTotal, and the results are linked from the release page.
 - If your antivirus quarantines the app, [check your download](#check-your-download). Then restore it from quarantine, or allow it in your antivirus. You can also report it to your antivirus vendor as a false positive.
 - **Windows Security → Ransomware protection (Controlled folder access)** can stop the app from changing subtitles in protected folders such as Documents or Videos. The app then shows *"Windows blocked the change…"* under **Issues**. Click **Allow an app through Controlled folder access**, add `AnimeSubsCustomizer.exe` from `%LOCALAPPDATA%\Programs\Anime Subs Customizer`, or keep your anime library in a folder that isn't protected.
 

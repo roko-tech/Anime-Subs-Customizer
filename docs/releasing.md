@@ -39,17 +39,17 @@
    sha256sum -c SHA256SUMS.txt
    gh attestation verify AnimeSubsCustomizer-Setup.exe -R roko-tech/Anime-Subs-Customizer
    ```
-   Then install the downloaded, Mark-of-the-Web-stamped installer in Windows Sandbox (first run in English and Arabic).
-
-   Upload the installer and the portable ZIP to [VirusTotal](https://www.virustotal.com/) and add the two result links to the draft's notes (`gh release edit vX.Y.Z --notes-file …`). Do this **after the last `release.yml` run on the tag**: a re-run rewrites the notes from `docs/release-notes/vX.Y.Z.md`.
+   Then install the downloaded, Mark-of-the-Web-stamped installer in Windows Sandbox (first run in English and Arabic). Launched from Explorer or `Start-Process`, it first shows Windows' *Open File - Security Warning* (Unknown Publisher): click **Run**, as users do.
 5. **Publish** the draft:
    ```
    gh release edit vX.Y.Z --draft=false --latest
    ```
+   "Latest" is locked once an immutable release is published, so set it here.
 6. **After publishing**, check while signed out (private browser window, `curl`):
    - both READMEs render;
    - `https://github.com/roko-tech/Anime-Subs-Customizer/releases/latest/download/AnimeSubsCustomizer-Setup.exe` redirects to the new asset;
    - `gh release verify-asset vX.Y.Z AnimeSubsCustomizer-Setup.exe` passes.
+7. **VirusTotal**, without an account: on [virustotal.com](https://www.virustotal.com/)'s **URL** tab, submit the versioned links `…/releases/download/vX.Y.Z/AnimeSubsCustomizer-Setup.exe` and `…-portable.zip`. VirusTotal downloads each file and opens its file report at `virustotal.com/gui/file/<sha256>`; if a report doesn't appear, upload that file on the **File** tab. Add the report links to the notes (`gh release edit vX.Y.Z --notes-file …`; notes stay editable on an immutable release) and to `docs/release-notes/vX.Y.Z.md`. Draft assets aren't public, so this runs after publishing.
 
 If the tag run fails before the draft is created **because of infrastructure** (a runner hiccup, a network timeout), re-run it from the tag: `gh workflow run release.yml -f ref=vX.Y.Z`. The workflow builds from the tag and updates the draft if one already exists; it never touches a published release. If the failure needs a **code change**, that version is burned: fix it on `master`, mark X.Y.Z as "not released" in the CHANGELOG, and release X.Y.Z+1. **Never move or delete a pushed tag.**
 
